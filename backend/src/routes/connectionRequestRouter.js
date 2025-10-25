@@ -5,10 +5,7 @@ const ConnectionRequestModel = require("../models/connection-request");
 const User = require("../models/user-model");
 
 // to sent the connection request
-connectionRouter.post(
-  "/request/:status/:toUserId",
-  userAuth,
-  async (req, res) => {
+connectionRouter.post("/request/:status/:toUserId", userAuth, async (req, res) => {
     try {
       const status = req.params.status;
       const toUserId = req.params.toUserId;
@@ -85,9 +82,9 @@ connectionRouter.post("/request/received/:status/:requestId", userAuth ,async (r
         return res.status(400).send("Connection Request not received")
       }
       connectionRequest.status = status
-     const data =  await connectionRequest.save()
+      const data =  await connectionRequest.save()
       res.status(200).json({mess:`Connection ${status}`,data:data})
-
+   
    } catch (error) {
       console.log(error)
       res.status(500).send("Internal server error",error)

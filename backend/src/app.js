@@ -9,7 +9,8 @@ const profileRouter = require("./routes/profileRouter");
 const connectionRouter = require("./routes/connectionRequestRouter");
 const userRouter = require("./routes/userRouter");
 const app = express();
-
+const http = require("http");
+const initalizeSocket = require("./routes/socket");
 const corsOptions={
   origin:"http://localhost:5173",
   credentials:true,
@@ -25,11 +26,12 @@ app.use("/",profileRouter);
 app.use("/",connectionRouter);
 app.use("/",userRouter)
 
-
+const server = http.createServer(app)
+initalizeSocket(server)
 connectDB()
   .then(() => {
     console.log("Database connected successfully..");
-    app.listen(8080, () => {
+    server.listen(8080, () => {
       console.log("server is listening on port 8080");
     });
   })

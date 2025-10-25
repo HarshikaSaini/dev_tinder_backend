@@ -16,6 +16,7 @@ const userSchema = new mongooes.Schema(
     },
     lastName: {
       type: String,
+      lowercase: true,
     },
     age: {
       type: Number,
