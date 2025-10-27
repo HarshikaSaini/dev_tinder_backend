@@ -14,12 +14,15 @@ const initalizeSocket = (server) => {
   const io = socket(server, {
     cors: {
       origin: "http://localhost:5173/",
-      credentials: true,
     },
   });
 
   io.on("connection", (socket) => {
-    socket.on("joinchat", () => {});
+    socket.on("joinchat", ({userId,targetId}) => {
+    const roomId = [userId,targetId].sort().join("_");
+    console.log(roomId)
+    socket.join(roomId)
+    });
     socket.on("sendMessage", () => {});
     socket.on("disconnect", () => {});
   });
