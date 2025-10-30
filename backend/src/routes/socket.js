@@ -13,15 +13,15 @@ const initalizeSocket = (server) => {
   // 	•	Avoid extra servers and ports.
   const io = socket(server, {
     cors: {
-      origin: "http://localhost:5173/",
+      origin: "http://localhost:5173",
     },
   });
 
   io.on("connection", (socket) => {
-    socket.on("joinchat", ({userId,targetId}) => {
-    const roomId = [userId,targetId].sort().join("_");
-    console.log(roomId)
-    socket.join(roomId)
+    socket.on("joinchat", ({firstName,userId,_id}) => {
+    const roomId = [userId,_id].sort().join("_");
+    console.log(firstName + " joined room " + roomId)
+    socket.join(roomId) // inbuilt Socket.Io function(join) that lets connected client join a named "room"
     });
     socket.on("sendMessage", () => {});
     socket.on("disconnect", () => {});
