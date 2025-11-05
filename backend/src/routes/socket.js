@@ -18,12 +18,17 @@ const initalizeSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    socket.on("joinchat", ({firstName,userId,_id}) => {
-    const roomId = [userId,_id].sort().join("_");
-    console.log(firstName + " joined room " + roomId)
-    socket.join(roomId) // inbuilt Socket.Io function(join) that lets connected client join a named "room"
+
+    socket.on("joinchat", ({ firstName, _id, targeted_user_id }) => {
+      const roomId = [_id, targeted_user_id].sort().join("_"); // creating custom room id
+      socket.join(roomId); // inbuilt Socket.Io function(join) that lets connected client join a named "room"
     });
-    socket.on("sendMessage", () => {});
+
+    socket.on("sendMessage", ({ firstName, userID, targetID, mess }) => {
+      const roomId = [userID, targetID].sort().join("_");
+      io.to(roomId).emit("messRecieved", { firstName, mess, userID });
+    });
+
     socket.on("disconnect", () => {});
   });
 };
