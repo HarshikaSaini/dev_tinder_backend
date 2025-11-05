@@ -1,4 +1,12 @@
 const socket = require("socket.io");
+const crypto = require("crypto");
+const { Chat } = require("../models/chat");
+const getSecreteId = (userId, targeted_user_id) => {
+  return crypto
+    .createHash("sha256")
+    .update([userId, targeted_user_id].sort().join("_"))
+    .digest("hex");
+};
 
 const initalizeSocket = (server) => {
   // server - This server can handle regular HTTP requests (like API calls, web page responses, etc.).
@@ -18,15 +26,36 @@ const initalizeSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-
     socket.on("joinchat", ({ firstName, _id, targeted_user_id }) => {
-      const roomId = [_id, targeted_user_id].sort().join("_"); // creating custom room id
+      const roomId = getSecreteId(_id, targeted_user_id); // creating custom room id
       socket.join(roomId); // inbuilt Socket.Io function(join) that lets connected client join a named "room"
     });
 
-    socket.on("sendMessage", ({ firstName, userID, targetID, mess }) => {
-      const roomId = [userID, targetID].sort().join("_");
-      io.to(roomId).emit("messRecieved", { firstName, mess, userID });
+    socket.on("sendMessage", async ({firstName,lastName,photoUrl,userID, targetID,mess,createdAt}) => {
+      try {
+        const roomId = getSecreteId(userID, targetID);
+        io.to(roomId).emit("messRecieved", {firstName,lastName,photoUrl,mess,userID,createdAt});
+
+        let chat = await Chat.findOne({
+          participants:{$all : [userID,targetID]}
+        })
+
+        if(!chat){
+         chat = new Chat({
+          participants:[userID,targetID],
+          message:[]
+         })
+        }
+
+        chat.message.push({
+          senderId:userID,
+          text:mess
+        });
+        
+        await chat.save();
+      } catch (error) {
+        console.log(error)
+      }
     });
 
     socket.on("disconnect", () => {});
