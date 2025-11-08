@@ -8,7 +8,16 @@ const messageSchema = new mongoose.Schema({
     },
     text:{
         type:String,
-        required:true
+        default:""
+    },
+    attachment:{
+        type:String,
+        default:null
+    },
+    attachmentType:{
+        type:String,
+        enum:["image","video","file",null],
+        default:null
     }
 },{timestamps:true})
 
@@ -20,4 +29,4 @@ const chatSchema = new mongoose.Schema({
 });
 
 const Chat = new mongoose.model("Chat", chatSchema);
-module.exports = {Chat,Mess};
+module.exports = {Chat};

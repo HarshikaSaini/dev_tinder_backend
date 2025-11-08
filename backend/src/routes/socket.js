@@ -1,6 +1,7 @@
 const socket = require("socket.io");
 const crypto = require("crypto");
 const { Chat } = require("../models/chat");
+const  ConnectionRequestModel  = require('../models/connection-request')
 const getSecreteId = (userId, targeted_user_id) => {
   return crypto
     .createHash("sha256")
@@ -31,11 +32,24 @@ const initalizeSocket = (server) => {
       socket.join(roomId); // inbuilt Socket.Io function(join) that lets connected client join a named "room"
     });
 
-    socket.on("sendMessage", async ({firstName,lastName,photoUrl,userID, targetID,mess,createdAt}) => {
+    socket.on("sendMessage", async ({firstName,lastName,photoUrl,userID, targetID,mess,attachment,attachmentType,createdAt}) => {
       try {
         const roomId = getSecreteId(userID, targetID);
-        io.to(roomId).emit("messRecieved", {firstName,lastName,photoUrl,mess,userID,createdAt});
+        const connectionExists = await ConnectionRequestModel.findOne({
+          status:"accepted",
+          $or:[
+             {fromUserId:userID ,toUserId:targetID},
+             {fromUserId:targetID, toUserId:userID}
+          ]
+        })
+     
+        if(!connectionExists){
+           console.log("Unauthorized message attempt")
+           return;
+        }
 
+        io.to(roomId).emit("messRecieved", {firstName,lastName,photoUrl,mess,userID,attachment,attachmentType,createdAt});
+        
         let chat = await Chat.findOne({
           participants:{$all : [userID,targetID]}
         })
@@ -49,7 +63,9 @@ const initalizeSocket = (server) => {
 
         chat.message.push({
           senderId:userID,
-          text:mess
+          text:mess,
+          attachment,
+          attachmentType
         });
         
         await chat.save();
