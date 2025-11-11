@@ -10,15 +10,6 @@ const messageSchema = new mongoose.Schema({
         type:String,
         default:""
     },
-    attachment:{
-        type:String,
-        default:null
-    },
-    attachmentType:{
-        type:String,
-        enum:["image","video","file",null],
-        default:null
-    }
 },{timestamps:true})
 
 const Mess = new mongoose.model("Mess", messageSchema)

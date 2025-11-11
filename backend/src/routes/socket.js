@@ -32,7 +32,7 @@ const initalizeSocket = (server) => {
       socket.join(roomId); // inbuilt Socket.Io function(join) that lets connected client join a named "room"
     });
 
-    socket.on("sendMessage", async ({firstName,lastName,photoUrl,userID, targetID,mess,attachment,attachmentType,createdAt}) => {
+    socket.on("sendMessage", async ({firstName,lastName,photoUrl,userID, targetID,mess,createdAt}) => {
       try {
         const roomId = getSecreteId(userID, targetID);
         const connectionExists = await ConnectionRequestModel.findOne({
@@ -48,7 +48,7 @@ const initalizeSocket = (server) => {
            return;
         }
 
-        io.to(roomId).emit("messRecieved", {firstName,lastName,photoUrl,mess,userID,attachment,attachmentType,createdAt});
+        io.to(roomId).emit("messRecieved", {firstName,lastName,photoUrl,mess,userID,targetID,createdAt});
         
         let chat = await Chat.findOne({
           participants:{$all : [userID,targetID]}
@@ -63,9 +63,7 @@ const initalizeSocket = (server) => {
 
         chat.message.push({
           senderId:userID,
-          text:mess,
-          attachment,
-          attachmentType
+          text:mess
         });
         
         await chat.save();
