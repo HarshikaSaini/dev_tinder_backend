@@ -8,7 +8,7 @@ authRouter.post("/signup", async (req, res) => {
   try {
     const { error } = userValidator(req.body);
     if (error) {
-      return res.status(400).json({ error });
+      return res.status(400).json({mess: error});
     }
     const {
       firstName,
@@ -32,7 +32,7 @@ authRouter.post("/signup", async (req, res) => {
       password: passwordHash,
     });
     await userData.save();
-    res.status(200).send("User Added successfully");
+    res.status(200).json({mess:"User Added successfully"});
   } catch (error) {
     if (error.name == "ValidationError") {
       const mess = Object.values(error.errors).map((err) => err.message);
