@@ -61,7 +61,7 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
     const loggedIn = req.user;
     // pagination for the users
     const page = req.query.page || 1;
-    let limit = req.query.limit || 10;
+    let limit = req.query.limit || 20;
     limit = limit > 50 ? 50 : limit;
     const skip = (page - 1) * limit;
     // get all the connection data to which user has done interaction
@@ -81,7 +81,7 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
         { _id: { $ne: loggedIn._id } },
       ],
     })
-      .select("firstName lastName age photoUrl gender contact desc")
+      .select("firstName lastName age photoUrl gender contact desc skills")
       .skip(skip)
       .limit(limit);
 
