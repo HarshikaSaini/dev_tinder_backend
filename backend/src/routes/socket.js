@@ -22,7 +22,8 @@ const initalizeSocket = (server) => {
   // 	•	Avoid extra servers and ports.
   const io = socket(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: process.env.FRONTEND_URL,
+      credentials:true,
     },
   });
 
