@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors")
+const session = require("express-session")
 dotenv.config();
 const connectDB = require("./connection");
 const cookieParser = require("cookie-parser");
@@ -13,7 +14,7 @@ const http = require("http");
 const initalizeSocket = require("./routes/socket");
 const chatRouter = require("./routes/chatRouter");
 const corsOptions={
-  origin:"http://localhost:5173",
+  origin:process.env.FRONTEND_URL,
   credentials:true,
   optionsSuccessStatus: 200
 }
@@ -21,7 +22,16 @@ const corsOptions={
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions))
-
+app.use(session({
+  secret:"some-secret",
+  resave:false,
+  saveUninitialized:false,
+  cookie:{
+    httpOnly:true,
+    sameSite:'none',
+    secure:true
+  }
+}))
 app.use("/", authRouter);
 app.use("/",profileRouter);
 app.use("/",connectionRouter);
