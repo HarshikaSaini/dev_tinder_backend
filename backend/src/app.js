@@ -22,6 +22,7 @@ const corsOptions={
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions))
+app.set("trust proxy", 1);
 app.use(session({
   secret:"some-secret",
   resave:false,
